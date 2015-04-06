@@ -146,7 +146,7 @@ ul {
         console.log("connected to SoundCloud");
         
         SC.get('/me', function(me) { 
-          // console.log("me", me);
+
           socket.emit('join', me.username); 
         });
         SC.get('/me/tracks', {}, function(tracks) {
@@ -159,7 +159,7 @@ ul {
                SC.oEmbed(single.permalink_url, {
                 auto_play: true
               }, function(oEmbed) {
-                // console.log("oEmbed", oEmbed);
+
                 $('.status').html(oEmbed.html);
               });
             });
@@ -167,9 +167,7 @@ ul {
           });
           $("body").append(myTracks.append(heading, list));
         });
-        // username = prompt("What is your username?");
-        // socket.emit('join', username);   
-      // });
+      
         //Start Recording 
       $('#startRecording a').click(function (e) {
           $('#startRecording');
@@ -184,9 +182,6 @@ ul {
       //Stop Recording 
       $('#stopRecording a').click(function (e) {
         e.preventDefault();
-        // $('#stopRecording');
-        // $('#playBack');
-        // $('upload');
         SC.recordStop();
       });
       //Playback recording 
@@ -212,13 +207,11 @@ ul {
                   sharing: 'public'
                 }
               }, 
-                //When uploaded track, provides link user, but not everyone
               function (track) {
-                // console.log("TRACK", track);
+
                 setTimeout(function () {
                   SC.oEmbed(track.permalink_url, {auto_play: true}, function(oEmbed) {
                     console.log("THIS IS oEMBED", oEmbed);
-                    // console.log(oEmbed.html);
                     socket.emit('messages', oEmbed.html );
                     $('.status').html(oEmbed.html);
                   });
