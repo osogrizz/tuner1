@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="wad.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet"  href="main.css">
+
+<style type="text/css">
+
+  body {
+  background: url("http://fc04.deviantart.net/fs70/i/2012/028/2/9/steampunk_guitar_by_steampunk22-d4nw3yu.jpg");
+  background-size: cover;
+  color: rgba(100,100,100,.9);
+}
+
+.title2 {
+  float: right;
+  margin-right: 8%;
+}
+
+.noteButtons {
+  height: 150px;
+  width: 260px;
+  margin: auto;
+
+  text-align: center;
+  color: rgba(180,180,180,.9);
+}
+
+.gstrings {
+  text-align: center;
+  background-color: rgba();
+  color: black;
+}
+
+ul {
+  margin: auto;
+  margin-left: 20px;
+}
+
+/*.sButton {
+  height: 50px;
+  width: 260px;
+  margin: auto;
+  text-align: center;
+}*/
+
+/*.recWrap {
+  margin: auto;
+  text-align: center;
+}
+
+#record {
+  background-color: red;
+  border-radius: 5px;
+  color: black;
+}
+
+#stopRec {
+  border-radius: 5px;
+  color: black;
+}
+
+#audiobox {
+
+}
+
+#analyser {
+*/
+}
+</style>
+<script src="//connect.soundcloud.com/sdk.js"></script>
+
+  <title>Tune up!</title>
+</head>
+<body>
+    <h1>Tune up!</h1>
+
+
+    <div class="noteButtons"> <h3>Guitar</h3><h4>(Standard tuning)</h4><br>
+    <form action="">
+      <input class="gStrings" type="button" id="lowE"  value="Low E">
+      <input class="gStrings" type="button" id="A" value="A">
+      <input class="gStrings" type="button" id="D" value="D">
+      <input class="gStrings" type="button" id="G" value="G">
+      <input class="gStrings" type="button" id="B" value="B">
+      <input class="gStrings" type="button" id="highE" value="High E">
+    </form>
+    </div>
+
+
+    <div class="soundcloud-player">
+    <ul>
+    <div id="player">
+      <li id="startRecording"><a href="#">Start Recording</a></li>
+    </div>
+      <li id="stopRecording"><a href="#">Stop Recording</a></li>
+      <li id="playBack"><a href="#">Play Recorded Sound</a></li>
+      <li id="upload"><a href="#">Upload</a></li>
+    </ul>
+    <p class="status"></p>
+    <div class="audioplayer">
+      </div>
+    </div>
+
+    <div class="title2">
+      <h1>Jam out!</h1>
+    </div>
+
+
+<script>
+  function updateTimer(ms) {
+      // update the timer text. Used when user is recording
+        $('.status').text(SC.Helper.millisecondsToHMS(ms));
+      }
+      //Connect to SoundCloud
+      SC.initialize({
+        client_id: "52d40d098a1ac658264418785ca0db87",
+        redirect_uri: "http://localhost:3000/auth/soundcloud/callback"
+      });
+      SC.connect(function() {
+        SC.record({
+          start: function() {
+            window.setTimeout(function() {
+              SC.recordStop();
+              SC.recordUpload({
+                track: { title: 'my-recording' }
+              });
+            }, 120000);
+          }
+        });
+        //Adds SoundCloud username to chat app
+        console.log("connected to SoundCloud");
+        
+        SC.get('/me', function(me) { 
+          // console.log("me", me);
+          socket.emit('join', me.username); 
+        });
+        SC.get('/me/tracks', {}, function(tracks) {
+          var myTracks = $("<div>");
+          var heading = $("<h1>").text("Recorded Tracks");
+          var list = $("<ul>");
+          tracks.forEach(function (single) {
+            var listItem = $("<li>").text(single.permalink);
+            listItem.on("click", function () {
+               SC.oEmbed(single.permalink_url, {
+                auto_play: true
+              }, function(oEmbed) {
+                // console.log("oEmbed", oEmbed);
+                $('.status').html(oEmbed.html);
+              });
+            });
+            list.append(listItem);
+          });
+          $("body").append(myTracks.append(heading, list));
+        });
+        // username = prompt("What is your username?");
+        // socket.emit('join', username);   
+      // });
+        //Start Recording 
+      $('#startRecording a').click(function (e) {
+          $('#startRecording');
+          $('#stopRecording');
+          e.preventDefault();
+          SC.record({
+            progress: function(ms, avgPeak) {
+                updateTimer(ms);
+            }
+          });
+      });
+      //Stop Recording 
+      $('#stopRecording a').click(function (e) {
+        e.preventDefault();
+        // $('#stopRecording');
+        // $('#playBack');
+        // $('upload');
+        SC.recordStop();
+      });
+      //Playback recording 
+      $('#playBack a').click(function (e) {
+        e.preventDefault();
+        updateTimer(0);
+        SC.recordPlay({
+          progress: function (ms) {
+            updateTimer(ms);
+          }
+        });
+      });
+      //Uploaded SoundCloud Track after recorded
+      $('#upload').click(function (e) {
+          e.preventDefault();
+          SC.connect({
+            connected: function() {
+              console.log("CONNECTED");
+              $('.status').html("Uploading...");
+              SC.recordUpload({
+                track: {
+                  title: 'New Track',
+                  sharing: 'public'
+                }
+              }, 
+                //When uploaded track, provides link user, but not everyone
+              function (track) {
+                // console.log("TRACK", track);
+                setTimeout(function () {
+                  SC.oEmbed(track.permalink_url, {auto_play: true}, function(oEmbed) {
+                    console.log("THIS IS oEMBED", oEmbed);
+                    // console.log(oEmbed.html);
+                    socket.emit('messages', oEmbed.html );
+                    $('.status').html(oEmbed.html);
+                  });
+                }, 120000);
+                $('.status').html("Uploaded: <a href='" + track.permalink_url + "'>" + track.permalink_url + "</a>");
+              });
+            }
+          });
+      });
+    });
+  
+    </script>
+
+
+    <script src="audio.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
