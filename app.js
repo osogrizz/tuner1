@@ -20,18 +20,13 @@ app.get('/auth/soundcloud/callback', function(req,res){
 
  
 
-
-
-
-
-
-
-
-
-
-
-
 // Start my server 
 app.listen(3000, function () {
   console.log("Server is running...");
 });
+
+
+
+
+
+

@@ -122,8 +122,9 @@ ul {
 
 
 <script>
+
+// CodeAcademy SoundCloud API tutorial
   function updateTimer(ms) {
-      // update the timer text. Used when user is recording
         $('.status').text(SC.Helper.millisecondsToHMS(ms));
       }
       //Connect to SoundCloud
@@ -199,7 +200,6 @@ ul {
           e.preventDefault();
           SC.connect({
             connected: function() {
-              console.log("CONNECTED");
               $('.status').html("Uploading...");
               SC.recordUpload({
                 track: {
@@ -211,8 +211,7 @@ ul {
 
                 setTimeout(function () {
                   SC.oEmbed(track.permalink_url, {auto_play: true}, function(oEmbed) {
-                    console.log("THIS IS oEMBED", oEmbed);
-                    socket.emit('messages', oEmbed.html );
+                    // socket.emit('messages', oEmbed.html );
                     $('.status').html(oEmbed.html);
                   });
                 }, 120000);
@@ -225,6 +224,135 @@ ul {
   
     </script>
 
+    <script>
+      function addListeners() {
+
+
+
+var currentlyPlaying = null;
+
+var stopSound = function () {
+  if (currentlyPlaying) {
+    currentlyPlaying.stop();
+  }
+};
+var toggleSound = function (sound) {
+  if (currentlyPlaying === sound) {
+    currentlyPlaying.stop();
+    currentlyPlaying = null;
+  } else {
+    console.log(sound);
+    stopSound();
+    sound.play();
+    currentlyPlaying = sound;
+  }
+};
+
+$("#lowE" ).click(function() {
+  toggleSound(E2);
+});
+
+$("#A" ).click(function() {
+  toggleSound(A2);
+});
+
+$("#D" ).click(function() {
+  toggleSound(D3);
+});
+
+$("#G" ).click(function() {
+  toggleSound(G3);
+});
+
+$("#B" ).click(function() {
+  toggleSound(B3);
+});
+
+$("#highE" ).click(function() {
+  toggleSound(E4);
+});
+
+
+$("#stopPlay").click(stopSound);
+
+
+
+      var E2 = new Wad({
+  source: "triangle",
+  pitch: 82.41,
+  env: {
+    attack: 0,
+    decay: 0,
+    sustain: 1,
+    hold: 120,
+    release: 0.2
+  }
+});
+
+var A2 = new Wad({
+  source: "triangle",
+  pitch: 110,
+  env: {
+    attack: 0,
+    decay: 0,
+    sustain: 1,
+    hold: 120,
+    release: 0.2
+  }
+});
+
+var D3 = new Wad({
+  source: "triangle",
+  pitch: 146.83,
+  env: {
+    attack: 0,
+    decay: 0,
+    sustain: 1,
+    hold: 120,
+    release: 0.2
+  }
+});
+
+var G3 = new Wad({
+  source: "triangle",
+  pitch: 196,
+  env: {
+    attack: 0,
+    decay: 0,
+    sustain: 1,
+    hold: 120,
+    release: 0.2
+  }
+});
+
+var B3 = new Wad({
+  source: "triangle",
+  pitch: 246.94,
+  env: {
+    attack: 0,
+    decay: 0,
+    sustain: 1,
+    hold: 120,
+    release: 0.2
+  }
+});
+
+var E4 = new Wad({
+  source: "triangle",
+  pitch: 329.63,
+  env: {
+    attack: 0,
+    decay: 0,
+    sustain: 1,
+    hold: 120,
+    release: 0.2
+  }
+});
+
+
+}
+window.onload = addListeners();
+    </script>
 
     <script src="audio.js"></script>
     <script src="script.js"></script>
